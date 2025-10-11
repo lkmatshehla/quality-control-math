@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cash Out</title>
+</head>
+<body>
+    <h1>Cash Out to PayPal</h1>
+    <p>Coins: {{ coins }} (USD ${{ usd }})</p>
+    <form method="post">
+        <label>PayPal Email:</label>
+        <input type="email" name="paypal_email" required>
+        <button type="submit">Cash Out</button>
+    </form>
+    <p>{{ message }}</p>
+    <a href="{{ url_for('index') }}">Back to Game</a>
+</body>
+</html>
