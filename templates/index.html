@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Math Game</title>
+</head>
+<body>
+    <h1>Math Game</h1>
+    <p>Coins: {{ coins }} (USD ${{ usd }})</p>
+    <form method="POST">
+        <label>{{ question }}</label>
+        <input type="text" name="answer" autocomplete="off">
+        <input type="submit" value="Submit">
+    </form>
+    <p>{{ feedback }}</p>
+    <a href="{{ url_for('cashout') }}">Cash Out to PayPal</a>
+</body>
+</html>
