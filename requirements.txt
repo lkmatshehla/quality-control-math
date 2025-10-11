@@ -1,4 +1,5 @@
 Flask==2.3.2
 paypalhttp==1.0.0
-paypalpayoutssdk
+paypal-payouts-sdk
+
 
