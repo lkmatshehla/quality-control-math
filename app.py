@@ -3,7 +3,8 @@ import random
 import time
 
 # Import PayPal Payouts SDK
-from paypalpayoutssdk.core import PayPalHttpClient, LiveEnvironment
+#from paypalpayoutssdk.core import PayPalHttpClient, LiveEnvironment
+from paypalpayoutssdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalpayoutssdk.payouts import PayoutsPostRequest
 from paypalhttp import HttpError
 
@@ -12,13 +13,17 @@ app.secret_key = "supersecretkey"
 COIN_TO_USD = 0.10
 
 # Your LIVE PayPal credentials (replace with your actual live keys)
-CLIENT_ID = "AYwazerdTT9PRde0K9tCmMjTLtuieD08o-EJ4ZqVymNpJoBvBuWgnBryzuXNWo9sohkIaAFRFh461jdg"
-CLIENT_SECRET = "EPUUZ2YuhclTL5mAONVDSOSE6yADoXIjYpS4lKfHSP5UfLAqJoU1uaK2cmVvql1_xYgOsAkOY80e0G5p"
+CLIENT_ID = "AWlZoWYDBXNzI-YeZaKxjHY-oL4sPeZYYK7Er0yPu11jQ8JjqSVUBCHcV-99k2Mm1dSsFQljmtZN9kCB"
+CLIENT_SECRET = "EE_LwO5uG-FlfcGYhryd_33OAQDOKayO3C8qGJqea-rkWSiIoOHtwK-N4agoWJDIcbJob83Bzei7lPcK"
 
-# Configure PayPal client in LIVE mode
+# Configure PayPal client in SANDBOX mode
 paypal_client = PayPalHttpClient(
-    LiveEnvironment(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+    SandboxEnvironment(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
 )
+# Configure PayPal client in LIVE mode
+#paypal_client = PayPalHttpClient(
+    #LiveEnvironment(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+#)
 
 def coins_to_currency(coins):
     return round(coins * COIN_TO_USD, 2)
