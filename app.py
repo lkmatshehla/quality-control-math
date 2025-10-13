@@ -85,7 +85,7 @@ def cashout():
                     {
                         "receiver": paypal_email,
                         "amount": {
-                            "value": f"{usd:.2f}",
+                            "value": f"{usd:.2f}".replace(",", "."),
                             "currency": "USD"
                         },
                         "note": "Your cashout from Math Game!",
