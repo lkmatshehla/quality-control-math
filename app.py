@@ -106,4 +106,5 @@ def cashout():
     return render_template("cashout.html", coins=session["coins"], usd=usd, message=message)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
