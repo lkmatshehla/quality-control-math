@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payout History</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+        th { background-color: #eee; }
+        .back-link { margin-top: 20px; display: inline-block; }
+        .summary { margin-top: 10px; font-weight: bold; }
+        button { margin-top: 10px; padding: 8px 12px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>📜 Your Payout History</h1>
+
+    <p class="summary">Total Earned: ${{ "%.2f"|format(total_earned) }}</p>
+
+    <form action="{{ url_for('download_csv') }}" method="get">
+        <button type="submit">⬇️ Download CSV</button>
+    </form>
+
+    {% if payouts %}
+    <table>
+        <tr>
+            <th>Email</th>
+            <th>Amount (USD)</th>
+            <th>Batch ID</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+        </tr>
+        {% for payout in payouts %}
+        <tr>
+            <td>{{ payout.email }}</td>
+            <td>${{ "%.2f"|format(payout.amount) }}</td>
+            <td>{{ payout.batch_id }}</td>
+            <td>{{ payout.timestamp }}</td>
+            <td>{{ payout.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No payouts yet. Solve some math and earn your first reward!</p>
+    {% endif %}
+
+    <a class="back-link" href="{{ url_for('index') }}">← Back to Game</a>
+</body>
+</html>
