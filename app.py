@@ -145,8 +145,11 @@ def cashout():
                     – Quality Control Math Team
                     """
                 )
-                mail.send(msg)
-
+                try:
+                    mail.send(msg)
+                except OSError:
+                    print("Email sending skipped: network unreachable on Render")
+                
             except HttpError as httpe:
                 message = f"❌ PayPal payout failed: {httpe.status_code} {httpe.message}"
         else:
