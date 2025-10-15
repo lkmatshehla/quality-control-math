@@ -7,6 +7,7 @@ import time
 from paypalpayoutssdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalpayoutssdk.payouts import PayoutsPostRequest
 from paypalhttp import HttpError
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -24,6 +25,17 @@ paypal_client = PayPalHttpClient(
 #paypal_client = PayPalHttpClient(
     #LiveEnvironment(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
 #)
+
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USERNAME='lesedimatshehla@gmail.com',
+    MAIL_PASSWORD='afwj uggn gmxi vvdr'  # Use Gmail App Password if needed
+)
+
+mail = Mail(app)
+
 
 def coins_to_currency(coins):
     return round(coins * COIN_TO_USD, 2)
@@ -67,6 +79,9 @@ def index():
 def cashout():
     if "coins" not in session:
         session["coins"] = 0
+    if "payouts" not in session:
+        session["payouts"] = []
+
     usd = coins_to_currency(session["coins"])
     message = ""
 
@@ -101,14 +116,80 @@ def cashout():
                 response = paypal_client.execute(payout_request)
                 batch_id = response.result.batch_header.payout_batch_id
                 message = f"✅ Payout sent! PayPal batch ID: {batch_id}"
+
+                # Store payout history
+                session["payouts"].append({
+                    "email": paypal_email,
+                    "amount": usd,
+                    "batch_id": batch_id,
+                    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "status": "Sent"
+                })
+
+                paid_amount = usd  # store before resetting
                 session["coins"] = 0
                 usd = 0.0
+
+                msg = Message(
+                    subject="✅ Math Game Payout Confirmation",
+                    sender=app.config["MAIL_USERNAME"],
+                    recipients=[paypal_email],
+                    body=f"""Hello,
+
+                    You've successfully cashed out ${paid_amount:.2f} from Quality Control Math
+                    Batch ID: {batch_id}
+                    Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S')}
+                
+                    Thanks for playing and keep solving!
+
+                    – Quality Control Math Team
+                    """
+                )
+                mail.send(msg)
+
             except HttpError as httpe:
                 message = f"❌ PayPal payout failed: {httpe.status_code} {httpe.message}"
         else:
             message = "Minimum cash out is $1 and valid PayPal email is required."
 
     return render_template("cashout.html", coins=session["coins"], usd=usd, message=message)
+
+#history route.
+@app.route("/history")
+def history():
+    if "payouts" not in session:
+        session["payouts"] = []
+
+    total_earned = sum(p["amount"] for p in session["payouts"])
+    return render_template("history.html", payouts=session["payouts"], total_earned=total_earned)
+
+import csv
+from io import StringIO
+from flask import Response
+#csv route
+@app.route("/download_csv")
+def download_csv():
+    if "payouts" not in session or not session["payouts"]:
+        return "No payout history to download."
+
+    si = StringIO()
+    writer = csv.writer(si)
+    writer.writerow(["Email", "Amount (USD)", "Batch ID", "Timestamp", "Status"])
+    for payout in session["payouts"]:
+        writer.writerow([
+            payout["email"],
+            f"{payout['amount']:.2f}",
+            payout["batch_id"],
+            payout["timestamp"],
+            payout.get("status", "Sent")
+        ])
+
+    output = si.getvalue()
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=payout_history.csv"}
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
